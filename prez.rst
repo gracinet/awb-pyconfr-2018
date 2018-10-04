@@ -106,13 +106,14 @@ Motivation / objectifs
 
 - minimalisme
 - généricité
-- performance
-- qualité
-- réconciliation avec la réalité
 - liberté
 
   + au sens du logiciel libre
   + guider le code applicatif sans l'entraver
+
+- performance
+- qualité
+- réconciliation avec la réalité
 
 =====
 
@@ -231,6 +232,24 @@ Motivation de la séparation entre ``PhysObj`` et ``PhysObj.Avatar`` :
 
 ====
 
+Pas de modèle ``Wms.Location``  ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Une certaine indirection…
+
+.. image:: av_loc_chain.png
+    :width: 777px
+    :height: 225px
+
+Avantages
+---------
+
+- Cas hybrides: racks et bacs, chariots
+- Opérations: recevoir un casier
+- Typages et propriétés: poubelle, zones techniques
+
+====
+
 Opérations
 ~~~~~~~~~~
 
@@ -250,10 +269,6 @@ physiques (ou de leurs avatars) doit se faire par des Opérations
 Opérations : cycle de vie
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO diagramme 2D
-
-inexistante -> planned -> started -> done
-
 - les opérations planifiées peuvent être :
 
    + annulées : ``cancel()``
@@ -265,6 +280,14 @@ inexistante -> planned -> started -> done
   + complètement oubliées : ``obliviate()``
   + renversées par planification d'une inverse *si possible* :
     ``plan_revert()``
+
+====
+
+Opérations : cycle de vie
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: operation_lifecycle.png
+
 
 ====
 
