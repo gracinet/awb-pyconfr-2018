@@ -22,7 +22,7 @@ Cas d'utilisation
 - commerce en ligne et en magasins
 - logistique pure
 - gestion de matériel
-- gestion de fabrication (GPAO)
+- gestion de fabrication
 
 ====
 
@@ -75,29 +75,7 @@ Points communs:
 
 - objets physiques
 - prévision / planification
-- la réalité est têtue !
-
-=====
-
-:data-x: r1600
-
-
-Champ fonctionnel
-~~~~~~~~~~~~~~~~~
-
-- caractérisation des objets physiques
-- niveaux de stocks
-
-  + présents (et inventaires)
-  + passés
-  + prévisionnels
-- encadrement du travail en entrepôt
-- planification
-- réservation
-- empaquetage et déballage
-- assemblage ou fabrication
-- traçabilité
-
+- la réalité est têtue, et elle a le dernier mot !
 
 =====
 
