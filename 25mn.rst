@@ -1,10 +1,18 @@
 :css: presentation.css
 :data-transition-duration: 0
 
+.. header::
+
+   .. image:: anyblok-logo_w_256.png
+
 AnyBlok / WMS  Base
 ~~~~~~~~~~~~~~~~~~~
 
 Un moteur d'applications de logistique avec Python 3, SQLAlchemy, PostgreSQL et AnyBlok.
+
+Présentation disponible en ligne
+
+https://github.com/gracinet/awb-pyconfr-2018/25mn.rst
 
 .. TODO illustration
 
@@ -377,6 +385,7 @@ Je reviens sur l'objectif initial…
   + primo utilisateurs
   + contributeurs
   + nouvelles briques intermédiaires ?
+  + jamais utilisé AnyBlok ? => https://github.com/AnyBlok/anyblok-book
 
 - nouveau nom ?
 
