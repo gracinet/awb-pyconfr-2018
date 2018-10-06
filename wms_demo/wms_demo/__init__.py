@@ -59,15 +59,27 @@ class Initializer:
         self.Arrival = self.Operation.Arrival
         self.Move = self.Operation.Move
 
-    def arrival(self, goods_code, loc_code, state='done'):
-        self.Arrival.create(
+    def arrival(self, goods_code, loc_code, state='done', props=None):
+        return self.Arrival.create(
             state=state,
             goods_type=self.POT.query().filter_by(code=goods_code).one(),
             location=self.PhysObj.query().filter_by(code=loc_code).one(),
+            goods_properties=props,
             )
 
+    def move(self, avatar, loc_code, state='done'):
+        return self.Move.create(
+            input=avatar,
+            destination=self.PhysObj.query().filter_by(code=loc_code).one(),
+            state=state)
+
     def add_goods(self):
-        self.arrival("GR-DUST-WIND-VOL2", "CASIER3")
+        for _ in range(5):
+            arr = self.arrival("GR-DUST-WIND-VOL2", "QUAI ENTRÉE",
+                               props=dict(lot="12A345"))
+            move = self.move(arr.outcomes[0], 'CASIER3')
+            move2 = self.move(move.outcomes[0], 'EMBALLAGE')
+            self.move(move2.outcomes[0], 'QUAI SORTIE', state='planned')
         self.arrival("GR-DUST-WIND-VOL1/PALETTE", "SALLE1")
 
     def add_data(self):
@@ -79,19 +91,39 @@ class Initializer:
 
     def init_types(self):
         livre = self.POT.insert(code="LIVRE")
+        bois_pal = self.POT.insert(code="PALETTE SUPPORT")
         dust_wind = self.POT.insert(code="GR-DUST-WIND", parent=livre)
         for vol in (1, 2, 3):
             prod = "GR-DUST-WIND-VOL%d" % vol
-            self.POT.insert(code=prod, parent=dust_wind)
-            self.POT.insert(code=prod + "/CARTON", parent=dust_wind)
-            self.POT.insert(code=prod + "/PALETTE", parent=dust_wind)
+            book = self.POT.insert(code=prod, parent=dust_wind)
+            cardboard = self.POT.insert(
+                code=prod + "/CARTON",
+                parent=dust_wind,
+                behaviours=dict(unpack=dict(
+                    outcomes=[
+                        dict(type=book.code,
+                             quantity=50,
+                             forward_properties=['lot'])
+                        ]
+                )))
+            self.POT.insert(code=prod + "/PALETTE",
+                            parent=dust_wind,
+                            behaviours=dict(unpack=dict(
+                                outcomes=[
+                                    dict(type=cardboard.code,
+                                         quantity=80,
+                                         forward_properties=['lot']),
+                                    dict(type=bois_pal.code,
+                                         quantity=1)
+                                    ]
+                            )))
 
     def init_locations(self):
         fixed_loctype = self.POT.insert(code='EMPLACEMENT FIXE',
                                         behaviours=dict(container=True)
                                         )
         wh = self.Wms.create_root_container(fixed_loctype, code='ENTR')
-        for code in ('DECHARGEMENT', 'STOCK', 'ENTR/CHARGEMENT'):
+        for code in ('QUAI ENTRÉE', 'STOCK', 'QUAI SORTIE', "EMBALLAGE"):
             self.Apparition.create(goods_type=fixed_loctype,
                                    location=wh,
                                    state='done',

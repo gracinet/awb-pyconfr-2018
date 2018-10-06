@@ -6,3 +6,8 @@ body {
 .step {
     width: 1280px;
 }
+
+div.use-case {
+
+    margin-top: 100px;
+}

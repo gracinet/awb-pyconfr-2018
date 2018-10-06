@@ -1,4 +1,5 @@
 :css: presentation.css
+:data-transition-duration: 0
 
 AnyBlok / WMS  Base
 ~~~~~~~~~~~~~~~~~~~
@@ -13,6 +14,17 @@ Un moteur d'applications de logistique avec Python 3, SQLAlchemy, PostgreSQL et 
     https://blog.racinet.fr/tag/logistique.html
 - documentation de référence (en anglais):
     https://anyblok-wms-base.readthedocs.io/en/latest/
+
+====
+
+Georges Racinet
+~~~~~~~~~~~~~~~
+
+- développeur python pro depuis 2005
+- fondation Anybox avec Christophe Combelles 2010
+
+  + applis gestion entreprise (ERP), en particulier stocks
+  + grande expérience logistique chez Anyboxiens
 
 ====
 
@@ -33,7 +45,7 @@ Cas d'utilisation
 - 100% libre et développé publiquement
 - couverture de tests à 100% depuis le début
 - documentation de référence (en anglais) exhaustive
-- version actuelle 0.8
+- version actuelle^W de ce soir : 0.8
 
 ====
 
@@ -58,24 +70,20 @@ Cas d'utilisation
 - commerce en ligne et en magasins
 - logistique pure
 - gestion de matériel
-- gestion de fabrication (GPAO)
+- gestion de fabrication
 
-=====
+====
 
-
-Cas d'utilisation
-~~~~~~~~~~~~~~~~~
-
-- commerce en ligne et en magasins
-- logistique pure
-- gestion de matériel
-- gestion de fabrication (GPAO)
-
-Points communs:
+Points communs
+~~~~~~~~~~~~~~
 
 - objets physiques
+- où ? quand ? comment / pourquoi ?
 - prévision / planification
 - la réalité est têtue, et elle a le dernier mot !
+
+.. note:: Avant passer de passer à du concret, un petit mot sur motivation.
+
 
 =====
 
@@ -88,6 +96,7 @@ Motivation / objectifs
 
   + au sens du logiciel libre
   + guider le code applicatif sans l'entraver
+  + la mienne
 
 - performance
 - qualité
@@ -99,115 +108,162 @@ Le scénario
 ~~~~~~~~~~~
 
 - vente de livres en gros 1/2 gros et détail
+- on va regarder le cas de *A Dance of Dust and Wind* (par Georges L.P.
+  Racinet)
+- 3 volumes
+- coffret de l'intégrale, préparé à l'entrepôt
 
 =====
 
-Démo 1 : objets physiques
-~~~~~~~~~~~~~~~~
+Objets physiques : le modèle PhysObj
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- on récupère un Type, puis un PhysObj
+On récupère un type, puis les objets physiques de ce type
 
+.. note::
+         Prendre son temps sur cet écran.
 
+         - rappeler Anyblok, modèle
 
-wms-core : concepts centraux
+         Insister sur première spécificité (une ligne par objet physique):
+
+         - pas de quantité
+         - pas de système d'unités
+
+.. code:: python
+
+     >>> PhysObj = registry.Wms.PhysObj
+     >>> livre_type = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL2').one())
+     >>> exemplaires = PhysObj.query().filter_by(type=livre_type).all()
+     >>> exemplaires
+     [Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=19, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=21, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=22, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2'))]
+
+====
+
+PhysObj : les Propriétés
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+En plus du ``type``, on dispose d'un système de propriétés flexibles.
+
+.. code:: python
+
+     >>> exemplaires[0]
+     Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')
+     >>> exemplaires[0].merged_properties()
+     {'lot': '12A345'}
+
+     >>> exemplaires[0].set_property('expo', True)
+     >>> exemplaires[0].get_property('expo')
+     True
+
+Sous le capot: un champ JSONB, ou des colonnes séparées
+
+====
+
+PhysObj : retour sur les Types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Si c'est différent (à manipuler) ce n'est pas la même chose !
+
+Donc un carton de 50, c'est un autre type que pour 50 exemplaires:
+
+.. code:: python
+
+    >>> carton = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
+    >>> PhysObj.query().filter_by(type=carton).count()
+    0
+
+Et une palette de 80 cartons, c'est encore autre chose que 80
+cartons:
+
+.. code:: python
+
+    >>> palette = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
+    >>> PhysObj.query().filter_by(type=palette).all()
+    [Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=6, code='GR-DUST-WIND-VOL1/PALETTE'))]
+
+====
+
+PhysObj.Avatar : où et quand
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-https://anyblok-wms-base.readthedocs.io/en/latest/core_concepts.html
-
-Deux familles de concepts dans wms-core :
-
-- les objets physiques
-- les opérations portant sur les objets physiques
-
-Les emplacements sont des objets physiques !
-
-====
-
-Objets physiques
-~~~~~~~~~~~~~~~~
-
-- modèle ``Wms.PhysObj``
-- un objet physique, une ligne en base
-
-  + vraiment ?
-  + si trop restrictif : wms-quantity
-
-- champ *type*
-- champ *properties* : propriétés flexibles
-- champ *code* (optionnel)
-
-====
-
-Objets physiques : le type
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Si c'est différent, ce n'est pas la même chose !
-
-- la notion de produit est souvent trop abstraite
-- doit correspondre à une réalité physique
-
-.. TODO photo bouteilles d'eau ? tourets ?
-
-Exemples de distinctions :
-
-- six bouteilles d'eau vs pack de 6
-- une palette de canettes vs 80 packs de 24
-- emballage ouvert ou non
-
-====
-
-Objets physiques : les propriétés
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Tout ce qui ne découle pas du *type* !
-
-Exemples :
-
-- numéros de série, de lot
-- dates d'expiration
-- prix d'achat
-
-Techniquement :
-
-- clef / valeur
-- JSONB ou colonne
-- mutualisation transparente par un mécanisme de copie à l'écriture (COW)
-
-====
-
-Objets physiques : démo
-~~~~~~~~~~~~~~~~~~~~~~~
-
-====
-
-Ontologie des objets physiques
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- deux instances de ``PhysObj`` de même type et propriétés, sans
-  ``code`` individuel sont indiscernables, mais Anyblok
-  / Wms Base va les considérer comme différents. Ce n'est
-  pas un problème en pratique si l'on fait attention.
-
-- l'instance de ``PhysObj`` représente l'être de l'objet, qui n'est
-  qu'une question de point de vue, à résoudre en fait par le
-  développeur applicatif.
-
-====
-
-Objets physiques : les avatars
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Les *avatars* encodent la présence d'un objet physique quelque part
 pour un certain laps de temps.
 
-- modèle: ``Wms.PhysObj.Avatar``
-- champ *location* (un autre objet physique)
-- champ *state*: passé, présent ou futur
-- champs *dt_from*, *dt_until* : dates et heures de début et de fin
+.. code:: python
 
-Motivation de la séparation entre ``PhysObj`` et ``PhysObj.Avatar`` :
+   >>> Avatar = PhysObj.Avatar
 
-- hygiène de base de données
-- réservation
+   >>> avatars = Avatar.query().filter_by(obj=exemplaires[0]).order_by(Avatar.dt_from).all()
+   >>> [(av.state, av.location.code, str(av.dt_from)) for av in avatars]
+
+   [('past', 'QUAI ENTRÉE', '2018-10-06 01:00:40.366405+02:00'),
+   ('past', 'CASIER3', '2018-10-06 01:00:40.397054+02:00'),
+   ('present', 'EMBALLAGE', '2018-10-06 01:00:40.416139+02:00'),
+   ('future', 'QUAI SORTIE', '2018-10-07 13:00:40.416139+02:00')]
+
+Les emplacements sont des objets physiques !
+
+.. code:: python
+
+   >>> avatars[0].location
+   Wms.PhysObj(id=2, code='QUAI ENTRÉE', type=Wms.PhysObj.Type(id=1, code='EMPLACEMENT FIXE'))
+
+====
+
+PhysObj.Avatar : où et quand
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: av_succession.png
+..   :width: 906
+..   :height: 581
+
+.. note:: Motivation de la séparation entre ``PhysObj`` et ``PhysObj.Avatar`` :
+
+          - hygiène de base de données
+          - réservation
+
+====
+
+PhysObj.Avatar : où et quand
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: av_succession_ops.png
+..   :width: 906
+..   :height: 581
+
+.. note:: Motivation de la séparation entre ``PhysObj`` et ``PhysObj.Avatar`` :
+
+          - hygiène de base de données
+          - réservation
+
+====
+
+Opérations
+~~~~~~~~~~
+
+.. code:: python
+
+   >>> op = avatars[-1].reason
+   >>> op
+   Model.Wms.Operation.Move(id=17, state='planned',
+                            input=Wms.PhysObj.Avatar(...),
+                            destination=Wms.PhysObj(id=4, code='QUAI SORTIE',  ...)
+   >>> op.execute()
+   >>> avatars[-1].state
+   'present'
+
+et pour finir, expédions !
+
+.. code:: python
+
+   >>> registry.Wms.Operation.Departure.create(input=avatars[-1], state='done')
+   >>> avatars[-1].state
+   'past'
 
 ====
 
@@ -220,28 +276,15 @@ Une certaine indirection…
     :width: 777px
     :height: 225px
 
+.. note:: AnyBlok / Wms Base fournit ce qu'il faut pour les quantités de
+          stocks.
+
 Avantages
 ---------
 
 - Cas hybrides: racks et bacs, chariots
-- Opérations: recevoir un casier
+- Opérations: déplacer, recevoir etc des emplacements
 - Typages et propriétés: poubelle, zones techniques
-
-====
-
-Opérations
-~~~~~~~~~~
-
-Espace de nommage : ``Wms.Operation``
-
-- Arrival, Move, Departure…
-- représente l'historique
-- permet la planification
-- entrées et sortie : des avatars
-- états: ``planned``, ``started`` et ``done``
-
-En principe, dans le code applicatif, toute manipulation des objets
-physiques (ou de leurs avatars) doit se faire par des Opérations
 
 ====
 
@@ -284,65 +327,28 @@ Opérations disponibles
 
 ====
 
-Réservation
-~~~~~~~~~~~
+Composants d'Anyblok / Wms Base
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Deux intérêts de la réservation :
+Jusqu'ici, c'était le Blok wms-core. Il y a aussi :
 
-- fonctionnel : par exemple, traiter des commandes client dans l'ordre
-- technique : réduction de la concurrence en base de données
+- wms-reservation
 
-Fonctionnalités apportées par le blok ``wms-reservation``
+  + fonctionnel (FIFO)
+  + passage à l'échelle (réduction concurrence DB par préselection)
 
-====
-
-Réservation : les principes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-- la demande de réservation (``Wms.Reservation.Request``) :
-
-   + un ensemble de besoins en objets physiques
-   + correspondant à un objectif (champ *purpose*) : livraison client,
-     fabrication…
-
-- la réservation (``Wms.Reservation``) porte sur un objet physique en
-  lien avec une demande de réservation.
-
-Quand un objet est réservé…
-
-- il peut très bien ne pas encore être présent !
-- la création d'opérations le concernant est prohibée…
-- sauf si l'on prend la main explicitement avec ``claim_reservations()``.
-
-====
-
-Réservation : architecture parallèle
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Pour passer à l'échelle, il est essentiel de pouvoir multiplier les
-processus et de limiter la concurrence en base de données.
-
-- processus réservateur (séquentiel) :
-
-    itère sur les demandes de réservation dans l'ordre et cherche à les
-    satisfaire. Peu parallélisable, mais travail très simple.
-
-- processus planificateur (parallélisable) :
-
-    itère sur les demandes satisfaites, et planifie les Opérations
-    adéquates en fonction de l'objectif. C'est lui qui effectuera les
-    tâches les plus lourdes.
-
-- processus utilisateur (parallélisable)
+- wms-quantity : pour les marchandises en vrac
 
 ====
 
 Développements futurs
 ~~~~~~~~~~~~~~~~~~~~~
 
+https://anyblok-wms-base.readthedocs.io/en/latest/improvements.html
+
 Beaucoup de choses intéressantes restent à faire :
 
-- start / finish / abort
+- opérations : start() / complete() / abort()
 - réécriture de prévisionnel (planification par affinage)
 - optimisations en tout genre
 - interface utilisateur basique (attention au mauvais générique)
@@ -364,7 +370,7 @@ Beaucoup de choses intéressantes restent à faire :
 But de la présentation
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Je reviens sur mon objectif…
+Je reviens sur l'objectif initial…
 
 - lancer un petit écosystème
 
@@ -373,3 +379,49 @@ Je reviens sur mon objectif…
   + nouvelles briques intermédiaires ?
 
 - nouveau nom ?
+
+====
+
+À vous pour les questions et suggestions !
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+====
+
+Complément : déballage
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   >>> palette
+   Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+   >>> palette_av = Avatar.query().join(Avatar.obj).filter_by(type=palette).one()
+   >>> palette_av.state, palette_av.location.code
+   ('present', 'SALLE1')
+   >>> unpack = registry.Wms.Operation.Unpack.create(input=palette_av, state='done')
+   >>> len(unpack.outcomes)
+   81
+
+   >>> set((avatar.state, avatar.obj.type.code, avatar.location.code)
+   ...     for avatar in unpack.outcomes)
+   {('present', 'GR-DUST-WIND-VOL1/CARTON', 'SALLE1'),
+   ('present', 'PALETTE SUPPORT', 'SALLE1')}
+
+====
+
+Déballage (déclaration)
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+   >>> palette
+   Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+   >>> palette.behaviours['unpack']
+   {'outcomes': [{'forward_properties': ['lot'],
+                  'quantity': 80,
+                  'required_properties': [],
+                  'type': 'GR-DUST-WIND-VOL1/CARTON'},
+                 {'forward_properties': [],
+                 'quantity': 1,
+                 'required_properties': [],
+                 'type': 'PALETTE SUPPORT'}]}}
+
