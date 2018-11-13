@@ -115,6 +115,25 @@ Motivation for AWB
 
 =====
 
+AnyBlok
+~~~~~~~
+
+* wrapper framework around SQLAlchemy
+* Object-Relational Mapping (ORM)
+* Model: a class mapped to a table
+
+Key aspects
+-----------
+
+* meant for modularity: Bloks
+* dynamical overrides (lateral injection)
+* ready for multi-tier applications (SAAS)
+    which Blok is active depends on the database
+* IPython interpreter wrapper (in display for this talk)
+* a few more niceties (simple relationships etc.)
+
+=====
+
 An example scenario
 ~~~~~~~~~~~~~~~~~~~
 
@@ -154,8 +173,8 @@ then the physical objects of that type.
          Take your time on this screen, it's the first with actual
          code examples.
 
+         - explain use of registry and Models
          - comment the PhysObj naming choice
-         - recall Anyblok and Models
 
 .. code:: python
 
@@ -163,6 +182,7 @@ then the physical objects of that type.
      In [2]: book_type = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL2').one()
      In [3]: units = PhysObj.query().filter_by(type=book_type).all()
      In [4]: units
+     Out[4]:
      [Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
      Wms.PhysObj(id=19, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
      Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
@@ -182,14 +202,16 @@ Physical Objects also sport a flexible properties system
 
 .. code:: python
 
-     >>> units[0]
-     Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')
-     >>> units[0].merged_properties()
-     {'lot': '12A345'}
+     In [5]: units[0]
+     Out[5]: Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')
 
-     >>> units[0].set_property('used-on-display', True)
-     >>> units[0].get_property('used-on-display')
-     True
+     In [6]: units[0].merged_properties()
+     Out[6]:{'lot': '12A345'}
+
+     In [7]: unit[0].set_property('used-on-display', True)
+
+     In [8]: units[0].get_property('used-on-display')
+     Out[9]: True
 
 Under the hood, within the ``flexible`` JSONB field, or separate table
 columns.
@@ -206,17 +228,19 @@ Ex: a box of 50 must be represented by another Type than 50 units:
 
 .. code:: python
 
-    >>> box = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/CARTON').one()
-    >>> PhysObj.query().filter_by(type=box).count()
+    In [8]: box = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/CARTON').one()
+
+    In [9]: PhysObj.query().filter_by(type=box).count()
     0
 
-And a palet of 80 boxes is again something else than 80 boxes:
+And a pallet of 80 boxes is again something else than 80 boxes:
 
 .. code:: python
 
-    >>> palet = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
-    >>> PhysObj.query().filter_by(type=palet).all()
-    [Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=6, code='GR-DUST-WIND-VOL1/PALETTE'))]
+    In [10]: pallet = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
+
+    In [11]: PhysObj.query().filter_by(type=pallet).all()
+    Out[11]: [Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=6, code='GR-DUST-WIND-VOL1/PALETTE'))]
 
 Up to now, we've seen how to answer the first question: "what?", time
 to speak of the others!
@@ -232,11 +256,12 @@ place information about the physical objects.
 
 .. code:: python
 
-   >>> Avatar = PhysObj.Avatar
+   In [12]: Avatar = PhysObj.Avatar
 
-   >>> avatars = Avatar.query().filter_by(obj=exemplaires[0]).order_by(Avatar.dt_from).all()
-   >>> [(av.state, av.location.code, str(av.dt_from)) for av in avatars]
+   In [13]: avatars = Avatar.query().filter_by(obj=units[0]).order_by(Avatar.dt_from).all()
 
+   In [14]: [(av.state, av.location.code, str(av.dt_from)) for av in avatars]
+   Out[14]:
    [('past', 'QUAI ENTRÉE', '2018-10-06 01:00:40.366405+02:00'),
    ('past', 'CASIER3', '2018-10-06 01:00:40.397054+02:00'),
    ('present', 'EMBALLAGE', '2018-10-06 01:00:40.416139+02:00'),
@@ -246,8 +271,8 @@ Locations are nothing but instances of ``Wms.PhysObj`` (!)
 
 .. code:: python
 
-   >>> avatars[0].location
-   Wms.PhysObj(id=2, code='QUAI ENTRÉE', type=Wms.PhysObj.Type(id=1, code='EMPLACEMENT FIXE'))
+   In [15]: avatars[0].location
+   Out[15]: Wms.PhysObj(id=2, code='QUAI ENTRÉE', type=Wms.PhysObj.Type(id=1, code='EMPLACEMENT FIXE'))
 
 ====
 
@@ -284,22 +309,27 @@ Operations: how and why
 
 .. code:: python
 
-   >>> op = avatars[-1].reason
-   >>> op
-   Model.Wms.Operation.Move(id=17, state='planned',
-                            input=Wms.PhysObj.Avatar(...),
-                            destination=Wms.PhysObj(id=4, code='QUAI SORTIE',  ...)
-   >>> op.execute()
-   >>> avatars[-1].state
-   'present'
+   In [16]: op = avatars[-1].reason  # will be outcome_of from 0.9 onwards
 
-to conclude, let's ship'em!
+   In [17]: op
+   Out[17]: Model.Wms.Operation.Move(id=17, state='planned',
+                                     input=Wms.PhysObj.Avatar(...),
+                                     destination=Wms.PhysObj(id=4,
+                                     code='QUAI SORTIE',  ...)
+
+   In [18]: op.execute()
+
+   In [19]: avatars[-1].state
+   Out[19]: 'present'
+
+To conclude, let's ship!
 
 .. code:: python
 
-   >>> registry.Wms.Operation.Departure.create(input=avatars[-1], state='done')
-   >>> avatars[-1].state
-   'past'
+   In [20]: registry.Wms.Operation.Departure.create(input=avatars[-1], state='done')
+
+   In [21]: avatars[-1].state
+   Out[21]: 'past'
 
 ====
 
@@ -375,14 +405,14 @@ also have:
 - wms-reservation
 
   + functional purposes(FIFO)
-  + scaling (reducing DB contention by predispatching)
+  + scaling by reducing DB contention
 
 - wms-quantity: for goods stored in bulk
 
 ====
 
 Future developments
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 General ideas page:
 https://anyblok-wms-base.readthedocs.io/en/latest/improvements.html
@@ -392,7 +422,7 @@ Lots of interesting things remain to be done:
 - operations: start() / complete() / abort()
 - planning alterations (in progress for 0.9)
 - various optimisations
-- basic UI (but beware of bad generics!)
+- basic UI
 - enrichment of the reservation system:
 
   + authorised Operations
@@ -401,7 +431,7 @@ Lots of interesting things remain to be done:
 - federation
 - new Bloks:
 
-  + inventaires (in progress)
+  + inventories (in progress)
   + location / container capacity
   + *(slots)* within location / containers
   + your ideas !
@@ -420,7 +450,7 @@ Let's rephrase the goals I stated near the beginning
   + new intermediate bricks
   + never used AnyBlok ? => https://github.com/AnyBlok/anyblok-book
 
-- a new name ? My tongue is sore !
+- a new name ? Please, my tongue is sore !
 
 ====
 
@@ -436,17 +466,21 @@ Let's unpack a pallet:
 
 .. code:: python
 
-   >>> palet
-   Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
-   >>> palet_av = Avatar.query().join(Avatar.obj).filter_by(type=palette).one()
-   >>> palet_av.state, palette_av.location.code
-   ('present', 'SALLE1')
-   >>> unpack = registry.Wms.Operation.Unpack.create(input=palette_av, state='done')
-   >>> len(unpack.outcomes)
+   In [22]: pallet
+   Out[22]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+
+   In [23]: pallet_av = Avatar.query().join(Avatar.obj).filter_by(type=pallet).one()
+
+   In [24]: pallet_av.state, pallet_av.location.code
+   Out[24]: ('present', 'SALLE1')
+
+   In [25]:unpack = registry.Wms.Operation.Unpack.create(input=pallet_av, state='done')
+   Out[25]: len(unpack.outcomes)
    81
 
-   >>> set((avatar.state, avatar.obj.type.code, avatar.location.code)
-   ...     for avatar in unpack.outcomes)
+   In [26]: set((avatar.state, avatar.obj.type.code, avatar.location.code)
+       ...:     for avatar in unpack.outcomes)
+   Out[26]:
    {('present', 'GR-DUST-WIND-VOL1/CARTON', 'SALLE1'),
    ('present', 'PALETTE SUPPORT', 'SALLE1')}
 
@@ -459,9 +493,11 @@ Let's introspect it:
 
 .. code:: python
 
-   >>> palet
-   Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
-   >>> palet.behaviours['unpack']
+   In [27]: pallet
+   Out[27]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+
+   In [28] pallet.behaviours['unpack']
+   Out[28]:
    {'outcomes': [{'forward_properties': ['lot'],
                   'quantity': 80,
                   'required_properties': [],
