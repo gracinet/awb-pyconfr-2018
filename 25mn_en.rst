@@ -5,39 +5,24 @@
 
    .. image:: anyblok-logo_w_256.png
 
-AnyBlok / WMS  Base
-~~~~~~~~~~~~~~~~~~~
+AnyBlok / WMS  Base (AWB)
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A stocks and logistics engine with Python 3, SQLAlchemy, PostgreSQL and AnyBlok.
 
-Slides and example project available online under
+- This presentation:
+    + slides: https://slides.racinet.fr/2018/pyparis
+    + source and examples: https://github.com/gracinet/awb-pyconfr-2018/
 
-https://github.com/gracinet/awb-pyconfr-2018/25mn_en.rst
-
-.. TODO illustration
-
-- code source :
-    https://github.com/AnyBlok/anyblok_wms_base
-- news on my blog (in french)
-    https://blog.racinet.fr/tag/logistique.html
-- reference documentation:
-    https://anyblok-wms-base.readthedocs.io/en/latest/
+- Anyblok / WMS Base
+    + source: https://github.com/AnyBlok/anyblok_wms_base
+    + news (in french): https://blog.racinet.fr/tag/logistique.html
+    + reference documentation: https://anyblok-wms-base.readthedocs.io
 
 ====
 
-Georges Racinet
-~~~~~~~~~~~~~~~
-
-- professional Python developer since 2005
-- cofounded Anybox with Christophe Combelles in 2010
-
-  + business applications (ERP), in particular with stocks
-  + lots of stocks and logistics experience at Anybox
-
-====
-
-Use cases
-~~~~~~~~~
+Stocks and Logistics ?
+~~~~~~~~~~~~~~~~~~~~~~
 
 - ecommerce and classic shops
 - pure logistics (carriers)
@@ -80,7 +65,7 @@ Use cases
 - manufacturing management
 - gear / fleet management
 
-What do they have in common ?
+*What do they have in common ?*
 
 ====
 
@@ -95,23 +80,7 @@ Common required features
 
 .. note:: Before diving in, a bit more about motivation
 
-
-=====
-
-Motivation for AWB
-~~~~~~~~~~~~~~~~~~
-
-- minimalism
-- genericity
-- freedom
-
-  + as in Free Software
-  + good directions for applicative code, but no impediment
-  + my personal freedom
-
-- performance
-- quality
-- resyncing with reality
+          history tracking: speak of stock levels
 
 =====
 
@@ -314,8 +283,7 @@ Operations: how and why
    In [17]: op
    Out[17]: Model.Wms.Operation.Move(id=17, state='planned',
                                      input=Wms.PhysObj.Avatar(...),
-                                     destination=Wms.PhysObj(id=4,
-                                     code='QUAI SORTIE',  ...)
+                                     destination=Wms.PhysObj(id=4, code='QUAI SORTIE',  ...))
 
    In [18]: op.execute()
 
