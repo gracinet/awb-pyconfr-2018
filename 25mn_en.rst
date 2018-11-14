@@ -35,6 +35,7 @@ State of the project
 ~~~~~~~~~~~~~~~~~~~~
 
 - pure library
+- less than a year old
 - 100% free software, publically available (github)
 - tests coverage has been 100% since the beginning
 - comprehensive reference documentation
@@ -193,23 +194,23 @@ PhysObj: more about Types
 
 If handling differs, PhysObj Type must differ
 
-Ex: a box of 50 must be represented by another Type than 50 units:
+Ex: a crate of 50 must be represented by another Type than 50 units:
 
 .. code:: python
 
-    In [8]: box = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/CARTON').one()
+    In [8]: crate = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/CRATE').one()
 
-    In [9]: PhysObj.query().filter_by(type=box).count()
+    In [9]: PhysObj.query().filter_by(type=crate).count()
     0
 
-And a pallet of 80 boxes is again something else than 80 boxes:
+And a pallet of 80 crates is again something else than 80 crates:
 
 .. code:: python
 
-    In [10]: pallet = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
+    In [10]: pallet = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALLET').one()
 
     In [11]: PhysObj.query().filter_by(type=pallet).all()
-    Out[11]: [Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=6, code='GR-DUST-WIND-VOL1/PALETTE'))]
+    Out[11]: [Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=6, code='GR-DUST-WIND-VOL1/PALLET'))]
 
 Up to now, we've seen how to answer the first question: "what?", time
 to speak of the others!
@@ -231,24 +232,25 @@ place information about the physical objects.
 
    In [14]: [(av.state, av.location.code, str(av.dt_from)) for av in avatars]
    Out[14]:
-   [('past', 'QUAI ENTRÉE', '2018-10-06 01:00:40.366405+02:00'),
-   ('past', 'CASIER3', '2018-10-06 01:00:40.397054+02:00'),
-   ('present', 'EMBALLAGE', '2018-10-06 01:00:40.416139+02:00'),
-   ('future', 'QUAI SORTIE', '2018-10-07 13:00:40.416139+02:00')]
+   [('past', 'IN PLATFORM', '2018-10-06 01:00:40.366405+02:00'),
+   ('past', 'BIN #3', '2018-10-06 01:00:40.397054+02:00'),
+   ('present', 'PACKING AREA', '2018-10-06 01:00:40.416139+02:00'),
+   ('future', 'OUT PLATFORM', '2018-10-07 13:00:40.416139+02:00')]
 
 Locations are nothing but instances of ``Wms.PhysObj`` (!)
 
 .. code:: python
 
    In [15]: avatars[0].location
-   Out[15]: Wms.PhysObj(id=2, code='QUAI ENTRÉE', type=Wms.PhysObj.Type(id=1, code='EMPLACEMENT FIXE'))
+   Out[15]: Wms.PhysObj(id=2, code='IN PLATFORM',
+                        type=Wms.PhysObj.Type(id=1, code='EMPLACEMENT FIXE'))
 
 ====
 
 PhysObj.Avatar: where and when
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: av_succession.png
+.. image:: av_succession_en.png
 ..   :width: 906
 ..   :height: 581
 
@@ -262,7 +264,7 @@ PhysObj.Avatar: where and when
 PhysObj.Avatar: where and when
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: av_succession_ops.png
+.. image:: av_succession_ops_en.png
 ..   :width: 906
 ..   :height: 581
 
@@ -283,7 +285,9 @@ Operations: how and why
    In [17]: op
    Out[17]: Model.Wms.Operation.Move(id=17, state='planned',
                                      input=Wms.PhysObj.Avatar(...),
-                                     destination=Wms.PhysObj(id=4, code='QUAI SORTIE',  ...))
+                                     destination=Wms.PhysObj(id=4,
+                                                             code='OUT PLATFORM',
+                                                             ...))
 
    In [18]: op.execute()
 
@@ -306,7 +310,7 @@ No separate Location Model ?
 
 This makes for a bit of indirection…
 
-.. image:: av_loc_chain.png
+.. image:: av_loc_chain_en.png
     :width: 777px
     :height: 225px
 
@@ -316,7 +320,7 @@ This makes for a bit of indirection…
 Benefits
 --------
 
-- Hybrid cases (racks, trays, flight cases) readily supported
+- Hybrid cases (trays, carts, flight cases) readily supported
 - all Operations are available for locations / containers: moving,
   receiving, scraping…
 - Type and Properties for locations: trash, special purpose areas
@@ -435,7 +439,7 @@ Let's unpack a pallet:
 .. code:: python
 
    In [22]: pallet
-   Out[22]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+   Out[22]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALLET')
 
    In [23]: pallet_av = Avatar.query().join(Avatar.obj).filter_by(type=pallet).one()
 
@@ -449,8 +453,8 @@ Let's unpack a pallet:
    In [26]: set((avatar.state, avatar.obj.type.code, avatar.location.code)
        ...:     for avatar in unpack.outcomes)
    Out[26]:
-   {('present', 'GR-DUST-WIND-VOL1/CARTON', 'SALLE1'),
-   ('present', 'PALETTE SUPPORT', 'SALLE1')}
+   {('present', 'GR-DUST-WIND-VOL1/CRATE', 'SALLE1'),
+   ('present', 'PALLET WOOD', 'SALLE1')}
 
 ====
 
@@ -462,16 +466,16 @@ Let's introspect it:
 .. code:: python
 
    In [27]: pallet
-   Out[27]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALETTE')
+   Out[27]: Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL1/PALLET')
 
    In [28] pallet.behaviours['unpack']
    Out[28]:
    {'outcomes': [{'forward_properties': ['lot'],
                   'quantity': 80,
                   'required_properties': [],
-                  'type': 'GR-DUST-WIND-VOL1/CARTON'},
+                  'type': 'GR-DUST-WIND-VOL1/CRATE'},
                  {'forward_properties': [],
                  'quantity': 1,
                  'required_properties': [],
-                 'type': 'PALETTE SUPPORT'}]}}
+                 'type': 'PALLET WOOD'}]}}
 
