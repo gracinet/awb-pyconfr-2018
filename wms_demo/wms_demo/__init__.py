@@ -176,6 +176,5 @@ def add():
         pdb.post_mortem(sys.exc_info()[2])
         registry.rollback()
         raise
-    import pdb; pdb.set_trace()
     registry.commit()
     registry.close()
