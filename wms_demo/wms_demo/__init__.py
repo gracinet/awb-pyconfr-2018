@@ -10,6 +10,7 @@
 import sys
 import logging
 from datetime import datetime
+from sqlalchemy.orm.attributes import flag_modified
 
 import anyblok
 from anyblok.blok import Blok
@@ -155,6 +156,39 @@ class Initializer:
                                    goods_code=code,
                                    location=armoire)
 
+    def change_loc_code(self, orig, changed):
+        loc = self.PhysObj.query().filter_by(code=orig).one()
+        loc.code = changed
+
+    def change_type_code(self, orig, changed):
+        pot = self.POT.query().filter_by(code=orig).one()
+        pot.code = changed
+        return pot
+
+    def translate_en(self):
+        for i in range(1, 4):
+            self.change_loc_code('CASIER%d' % i, 'BIN #%d' % i)
+            self.change_loc_code('ARMOIRE%d' % i, 'SHELVING #%d' % i)
+            self.change_loc_code('SALLE%d' % i, 'HALL #%d' % i)
+        self.change_loc_code("QUAI ENTRÉE", "IN PLATFORM")
+        self.change_loc_code("QUAI SORTIE", "OUT PLATFORM")
+        self.change_loc_code("EMBALLAGE", "PACKING AREA")
+
+        self.change_type_code("LIVRE", "BOOK")
+        self.change_type_code("PALETTE SUPPORT", "PALLET WOOD")
+        for vol in (1, 2, 3):
+            prod = "GR-DUST-WIND-VOL%d" % vol
+
+            crate = self.change_type_code(prod + "/CARTON", prod + "/CRATE")
+            crate.behaviours['unpack']['outcomes'][0]['type'] = prod
+            flag_modified(crate, '__anyblok_field_behaviours')
+
+            pallet = self.change_type_code(prod + "/PALETTE",
+                                           prod + "/PALLET")
+            pallet.behaviours['unpack']['outcomes'][0]['type'] = crate.code
+            pallet.behaviours['unpack']['outcomes'][1]['type'] = "PALLET WOOD"
+            flag_modified(pallet, '__anyblok_field_behaviours')
+
 
 def add():
     """Add more data to the example DB.
@@ -171,6 +205,34 @@ def add():
     init = Initializer(registry)
     try:
         init.add_data()
+    except:
+        import pdb
+        pdb.post_mortem(sys.exc_info()[2])
+        registry.rollback()
+        raise
+    registry.commit()
+    registry.close()
+
+
+def translate_en():
+    """To switch the examples to the english version.
+
+    Once this has run, add_data() can't work anymore.
+    This is obviously suboptimal: in a real application, one would
+    probably refactor stuff, but we don't want to change the commands
+    that were run during the presentations, which makes more constraints.
+    """
+
+    registry = anyblok.start('basic', configuration_groups=[],
+                             loadwithoutmigration=True,
+                             isolation_level='SERIALIZABLE')
+    if registry is None:
+        logging.critical("Couldn't initialize registry")
+        sys.exit(1)
+
+    init = Initializer(registry)
+    try:
+        init.translate_en()
     except:
         import pdb
         pdb.post_mortem(sys.exc_info()[2])

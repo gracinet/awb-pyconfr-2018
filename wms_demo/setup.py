@@ -33,7 +33,8 @@ setup(
             'pyconfr-2018=wms_demo:WmsDemo',
         ],
         'console_scripts': [
-            'add_data=wms_demo:add'
+            'add_data=wms_demo:add',
+            'translate_en=wms_demo:translate_en',
         ]
     },
     include_package_data=True,
