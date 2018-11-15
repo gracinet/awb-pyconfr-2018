@@ -10,8 +10,8 @@ speaking* Pythonistas, these are entirely written in french.
 If you're looking for the revision actually projected at the event,
 this was or will be the ``pycon.fr-2018`` tag.
 
-Howto generate and watch
-------------------------
+How to generate and watch
+-------------------------
 
 - install hovercraft with python3::
 
@@ -23,6 +23,38 @@ Howto generate and watch
     hoverenv/bin/hovercraft prez.rst
 
 - open http://localhost:8000 in your favorite web browser
+
+How to install and run the examples
+-----------------------------------
+Minimal set of steps
+
+- create a virtualenv::
+
+    python3 -m venv venv
+
+- install the demo project::
+
+    pip install -e wms_demo
+
+- have a running PostgreSQL cluster and run the following commands as
+  a user that's bound to a PostgreSQL user (role) that has the right
+  to create a database.
+- create the database and install the provided demo blok in the database::
+
+    venv/bin/anyblok_createdb -c demo.cfg
+
+- add some data for the examples (french version)::
+
+    venv/bin/add_data -c demo.cfg
+
+- Translate the data to english if you wanna try the examples from the
+  english version of the talk::
+
+    venv/bin/translate_en -c demo.cfg
+
+- Play with it::
+
+    venv/bin/anyblok_interpreter -c demo.cfg
 
 Credits
 -------
