@@ -1,0 +1,160 @@
+  \documentclass{beamer}
+  \usepackage[utf8]{inputenc}
+  \usetheme{Warsaw}
+  \usepackage{minted}
+
+  \title{AnyBlok / WMS Base}
+  \author{Georges Racinet}
+  \institute{Anybox, \url{https://anybox.fr}}
+
+  \pgfdeclareimage[height=10mm,width=10mm]{anyblok-logo}{anyblok-logo_w_256.png}
+  \logo{\pgfuseimage{anyblok-logo}}
+  \date{pycon.fr 2018}
+  \begin{document}
+
+  \begin{frame}
+    \titlepage
+    \begin{center}
+      Un moteur d'applications de logistique avec Python 3, SQLAlchemy,
+      PostgreSQL et AnyBlok.
+    \end{center}
+
+    Présentation disponible en ligne sur
+    \url{https://slides.racinet.fr/2018/pycon.fr.pdf}
+  \end{frame}
+
+  \begin{frame}{Anyblok / WMS Base}{Ressources}
+
+  \begin{itemize}
+    \item Cette présentation:
+      \begin{itemize}
+        \item PDF: \url{https://slides.racinet.fr/2018/pycon.fr.pdf}
+        \item source:
+          \url{https://github.com/gracinet/awb-pyconfr-2018/pyconfr.tex}
+      \end{itemize}
+    \item Ressources sur AWB:
+      \begin{itemize}
+        \item code source: \url{https://github.com/AnyBlok/anyblok_wms_base}
+        \item nouvelles sur mon blog (en français):
+          \url{https://blog.racinet.fr/tag/logistique.html}
+        \item documentation de référence (en anglais)
+          \url{https://anyblok-wms-base.readthedocs.io/en/latest}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Georges Racinet}
+  \begin{itemize}
+    \item développeur python pro depuis 2005
+    \item fondation Anybox avec Christophe Combelles 2010
+      \begin{itemize}
+      \item applis gestion entreprise (ERP), en particulier stocks
+      \item grande expérience logistique chez Anyboxiens
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cas d'utilisation}
+  \begin{itemize}
+    \item commerce en ligne et en magasins
+    \item logistique pure
+    \item gestion de matériel
+    \item gestion de fabrication
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{État du projet}
+  \begin{itemize}
+  \item pure bibliothèque
+  \item 100\% libre et développé publiquement
+  \item couverture de tests à 100\% depuis le début
+  \item documentation de référence (en anglais) exhaustive
+  \item version actuelle : 0.8
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{But de la présentation}
+  J'assume…
+  \begin{itemize}
+    \item<2-> développeurs, développeurs !
+      \begin{itemize}
+        \item<3-> primo utilisateurs
+        \item<4-> contributeurs
+        \item<5-> nouvelles briques intermédiaires ?
+      \end{itemize}
+    \item<6-> nouveau nom ?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Cas d'utilisation}
+  Revenons sur les cas d'utilisation…
+  \begin{itemize}
+    \item commerce en ligne et en magasins
+    \item logistique pure
+    \item gestion de matériel
+    \item gestion de fabrication
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Points communs}{Cas d'utilisation}
+  \begin{itemize}
+    \item<2-> objets physiques
+    \item<3-> où ? quand ? comment / pourquoi ?
+    \item<4-> prévision / planification
+    \item<5-> la réalité est têtue, et elle a le dernier mot !
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Motivation et objectifs}
+  \begin{itemize}
+    \item<2-> minimalisme
+    \item<3-> généricité
+    \item<4-> liberté
+      \begin{itemize}
+        \item au sens du logiciel libre
+        \item guider le code applicatif sans l'entraver
+        \item la mienne
+      \end{itemize}
+    \item<5-> performance
+    \item<6-> qualité
+    \item<7-> réconciliation avec la réalité
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  {Le scénario}{Un fil conducteur pour les exemples}
+  \begin{itemize}
+    \item vente de livres en gros 1/2 gros et détail
+    \item on va regarder le cas de *A Dance of Dust and Wind* (par Georges L.P.
+  Racinet)
+    \item 3 volumes
+    \item coffret de l'intégrale, préparé à l'entrepôt
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Objets physiques : le modèle PhysObj}
+
+On récupère un type, puis les objets physiques de ce type :
+\begin{minted}[fontsize=\footnotesize,xleftmargin=-4em]{python3}
+     >>> PhysObj = registry.Wms.PhysObj
+     >>> livre_type = (PhysObj.Type.query()
+     ...               .filter_by(code='GR-DUST-WIND-VOL2').one())
+     >>> exemplaires = PhysObj.query().filter_by(type=livre_type).all()
+     >>> exemplaires
+     [Wms.PhysObj(id=18, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=19, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=20, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=21, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2')),
+     Wms.PhysObj(id=22, type=Wms.PhysObj.Type(id=7, code='GR-DUST-WIND-VOL2'))]
+\end{minted}
+
+\uncover<2->{Premières remarques:}
+\begin{itemize}
+  \item<2-> Une ligne par objet physique
+  \item<3-> Pas de champ quantité
+  \item<4-> Pas de système d'unités, l'unité fait partie du type
+\end{itemize}
+\end{frame}
+
+
+\end{document}
