@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="26cm" height="8cm" viewBox="7 137 517 149" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g id="Background">
+    <g>
+      <path style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" d="M 215.392 142 L 262.942,142 L 262.942,164 L 239.167,169.5 L 215.392,164 L 215.392,142z"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="239.167" y="157">
+        <tspan x="239.167" y="157"></tspan>
+      </text>
+    </g>
+    <g>
+      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="239.166" y1="169.5" x2="239.861" y2="226.028"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="234.766,218.326 239.889,228.264 244.765,218.203 "/>
+    </g>
+    <g>
+      <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="196.667" y="230.5" width="86.5" height="54" rx="0" ry="0"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="239.917" y="261.4">
+        <tspan x="239.917" y="261.4"></tspan>
+      </text>
+    </g>
+    <g>
+      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #991414" x1="262.94" y1="164" x2="356.163" y2="228.879"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #991414" points="346.935,228.548 357.999,230.157 352.647,220.34 "/>
+    </g>
+    <g>
+      <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="323.834" y="231.434" width="72" height="54" rx="0" ry="0"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="359.834" y="262.334">
+        <tspan x="359.834" y="262.334"></tspan>
+      </text>
+    </g>
+    <text font-size="15.8044" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="219.334" y="260.666">
+      <tspan x="219.334" y="260.666">Livre</tspan>
+    </text>
+    <text font-size="15.8044" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="335.666" y="261.6">
+      <tspan x="335.666" y="261.6">Casier</tspan>
+    </text>
+    <g>
+      <path style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" fill-rule="evenodd" d="M 335.666 139.6 L 383.216,139.6 L 383.216,161.6 L 359.441,167.1 L 335.666,161.6 L 335.666,139.6z"/>
+      <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="359.441" y="154.6">
+        <tspan x="359.441" y="154.6"></tspan>
+      </text>
+    </g>
+    <g>
+      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x1="359.44" y1="167.1" x2="359.807" y2="226.962"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #000000" points="354.759,219.229 359.82,229.198 364.759,219.168 "/>
+    </g>
+    <g>
+      <line style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #991414" x1="383.216" y1="161.6" x2="476.963" y2="225.092"/>
+      <polyline style="fill: none; stroke-opacity: 1; stroke-width: 2; stroke: #991414" points="467.731,224.878 478.815,226.346 473.339,216.599 "/>
+    </g>
+    <g>
+      <rect style="fill: #ffffff; fill-opacity: 1; stroke-opacity: 1; stroke-width: 2; stroke: #000000" x="438.516" y="227.6" width="84.3" height="54" rx="0" ry="0"/>
+      <text font-size="15.8044" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="480.666" y="259.372">
+        <tspan x="480.666" y="259.372">Armoire</tspan>
+      </text>
+    </g>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="214.666" y="196">
+      <tspan x="214.666" y="196">obj</tspan>
+    </text>
+    <text font-size="18.0622" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="7.66666" y="256.5">
+      <tspan x="7.66666" y="256.5">Objets physiques</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="334.666" y="194.7">
+      <tspan x="334.666" y="194.7">obj</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #991414; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="269.666" y="218.334">
+      <tspan x="269.666" y="218.334">location</tspan>
+    </text>
+    <text font-size="12.8" style="fill: #991414; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="395.666" y="217.7">
+      <tspan x="395.666" y="217.7">location</tspan>
+    </text>
+    <text font-size="18.0622" style="fill: #000000; fill-opacity: 1; stroke: none;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="105.667" y="159">
+      <tspan x="105.667" y="159">Avatars</tspan>
+    </text>
+  </g>
+</svg>
