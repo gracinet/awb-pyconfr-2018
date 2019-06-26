@@ -181,7 +181,7 @@ Donc un carton de 50, c'est un autre type que pour 50 exemplaires:
 
 .. code:: python
 
-    >>> carton = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/PALETTE').one()
+    >>> carton = PhysObj.Type.query().filter_by(code='GR-DUST-WIND-VOL1/CARTON').one()
     >>> PhysObj.query().filter_by(type=carton).count()
     0
 
